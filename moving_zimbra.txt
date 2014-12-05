@@ -1,7 +1,7 @@
 Moving Zimbra to another server
 -------------------------------
 
-One hour before, change smtp/pop/webmail/spf to new IPs.
+One hour before, change smtp/pop/webmail/spf DNS to the new IP.
 Also, you already synchronized your zimbra origin directory with destination, right?
 
 On origin
@@ -22,7 +22,7 @@ $ exit
 # cd /opt/zimbra
 # rm -rf conf data db index logger redolog store
 # for f in conf data db index logger redolog store; do mv /opt/zimbra.old/$f .; done
-# mv /opt/zimbra.old/postfix-2.10.2.2z/conf postfix-2.10.2.2z/ # use the latest version, it could have more than one ;)
+# mv /opt/zimbra.old/postfix-2.10.2.2z/conf postfix-2.10.2.2z/ # use the latest version, it could has more than one ;)
 # rm -f data/postfix/spool/pid/master.pid
 # rsync -avP origin:/opt/zimbra/mailboxd/etc/keystore mailboxd/etc/
 # /opt/zimbra/libexec/zmfixperms -extended
