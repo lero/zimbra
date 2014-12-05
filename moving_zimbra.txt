@@ -1,0 +1,42 @@
+Moving Zimbra to another server
+-------------------------------
+
+One hour before, change smtp/pop/webmail/spf to new IPs.
+Also, you already synchronized your zimbra origin directory with destination, right?
+
+On origin
+---------
+
+$ zmcontrol stop
+# rsync --delete -axvzKHS /opt/zimbra/ destination:/opt/zimbra.old/
+# rsync --delete -axvzKHS /opt/zimbra/ destination:/opt/zimbra.old/ # just to be sure
+
+On destination
+--------------
+
+Install same version of Zimbra as origin.
+
+# su - zimbra
+$ zmcontrol stop
+$ exit
+# cd /opt/zimbra
+# rm -rf conf data db index logger redolog store
+# for f in conf data db index logger redolog store; do mv /opt/zimbra.old/$f .; done
+# mv /opt/zimbra.old/postfix-2.10.2.2z/conf postfix-2.10.2.2z/ # use the latest version, it could have more than one ;)
+# rm -f data/postfix/spool/pid/master.pid
+# rsync -avP origin:/opt/zimbra/mailboxd/etc/keystore mailboxd/etc/
+# /opt/zimbra/libexec/zmfixperms -extended
+# su - zimbra
+$ /opt/zimbra/libexec/zmsetservername -n your_new_fqdn
+$ exit
+# hostname your_new_hostname
+
+On /opt/zimbra/conf/localconfig.xml, change <key name="zimbra_uid"> and <key name="zimbra_gid"> to match
+your local zimbra user and group ID.
+
+# su - zimbra
+$ zmcontrol start
+$ zmprov ms your_new_fqdn zimbraMtaMyNetworks '127.0.0.0/8 your_new_external_ip/32'
+$ postfix reload
+
+Now check the logs and test everything!
